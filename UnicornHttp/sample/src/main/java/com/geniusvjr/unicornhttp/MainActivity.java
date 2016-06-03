@@ -6,9 +6,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.geniusvjr.http.ICallback;
+import com.geniusvjr.http.Callback;
 import com.geniusvjr.http.Request;
 import com.geniusvjr.http.RequestTask;
+
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -28,7 +29,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.mRunOnSubThreadBtn:
-                testHttpPostOnSubThread();
+//                testHttpPostOnSubThread();
+                testHttpPostOnSubThreadForGeneric();
                 break;
         }
 
@@ -39,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String content = "account=stay4it&password=123456";
 
         Request request = new Request(url, Request.RequestMethod.POST);
-        request.setCallback(new ICallback() {
+        request.setCallback(new Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 Log.e("stay", "testHttpGet return:" + result);
@@ -50,6 +52,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 e.printStackTrace();
             }
         });
+        request.content = content;
+        RequestTask task = new RequestTask(request);
+        task.execute();
+    }
+
+    private void testHttpPostOnSubThreadForGeneric() {
+        String url = "http://api.stay4it.com/v1/public/core/?service=user.login";
+        String content = "account=stay4it&password=123456";
+
+        Request request = new Request(url, Request.RequestMethod.POST);
+        request.setCallback(new Callback<User>() {
+            @Override
+            public void onSuccess(User result) {
+                Log.e("stay", "testHttpGet return:" + result);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+            }
+
+
+        }.setReturnType(User.class));
         request.content = content;
         RequestTask task = new RequestTask(request);
         task.execute();

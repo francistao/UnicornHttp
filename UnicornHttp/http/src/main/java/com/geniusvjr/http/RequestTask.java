@@ -3,6 +3,7 @@ package com.geniusvjr.http;
 import android.os.AsyncTask;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 
 /**
  * Created by Stay on 28/6/15.
@@ -25,8 +26,10 @@ public class RequestTask extends AsyncTask<Void, Integer, Object> {
     @Override
     protected Object doInBackground(Void... params) {
         try {
-            return HttpUrlConnectionUtil.execute(request);
-        } catch (IOException e) {
+            HttpURLConnection connection = HttpUrlConnectionUtil.execute(request);
+            return request.iCallback.parse(connection);
+
+        } catch (Exception e) {
             return e;
         }
     }
@@ -37,7 +40,7 @@ public class RequestTask extends AsyncTask<Void, Integer, Object> {
         if (o instanceof Exception) {
             request.iCallback.onFailure((Exception) o);
         } else {
-            request.iCallback.onSuccess((String) o);
+            request.iCallback.onSuccess(o);
         }
 
 
