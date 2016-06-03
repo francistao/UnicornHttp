@@ -1,17 +1,14 @@
 package com.geniusvjr.http;
 
-import org.apache.http.HttpStatus;
-
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 
 /**
- * 帮忙负责请求服务器的
+ * Created by Stay on 24/6/15.
+ * Powered by www.stay4it.com
  */
 public class HttpUrlConnectionUtil {
     public static HttpURLConnection execute(Request request) throws IOException {

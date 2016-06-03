@@ -1,18 +1,23 @@
 package com.geniusvjr.unicornhttp;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import com.geniusvjr.http.Callback;
+import com.geniusvjr.http.FileCallback;
+import com.geniusvjr.http.JsonCallback;
 import com.geniusvjr.http.Request;
 import com.geniusvjr.http.RequestTask;
 
+import java.io.File;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
     private Button mRunOnSubThreadBtn;
 
@@ -20,28 +25,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mRunOnSubThreadBtn = (Button)findViewById(R.id.mRunOnSubThreadBtn);
+        mRunOnSubThreadBtn = (Button) findViewById(R.id.mRunOnSubThreadBtn);
         mRunOnSubThreadBtn.setOnClickListener(this);
-
     }
+
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.mRunOnSubThreadBtn:
 //                testHttpPostOnSubThread();
-                testHttpPostOnSubThreadForGeneric();
+//                testHttpPostOnSubThreadForGeneric();
+                testHttpPostOnSubThreadForDownload();
                 break;
         }
-
     }
 
-    private void testHttpPostOnSubThread() {
+    public void testHttpPostOnSubThread() {
+
         String url = "http://api.stay4it.com/v1/public/core/?service=user.login";
         String content = "account=stay4it&password=123456";
-
         Request request = new Request(url, Request.RequestMethod.POST);
-        request.setCallback(new Callback<String>() {
+        request.setCallback(new JsonCallback<String>() {
+
             @Override
             public void onSuccess(String result) {
                 Log.e("stay", "testHttpGet return:" + result);
@@ -57,15 +63,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         task.execute();
     }
 
-    private void testHttpPostOnSubThreadForGeneric() {
+    public void testHttpPostOnSubThreadForGeneric() {
+
         String url = "http://api.stay4it.com/v1/public/core/?service=user.login";
         String content = "account=stay4it&password=123456";
-
         Request request = new Request(url, Request.RequestMethod.POST);
-        request.setCallback(new Callback<User>() {
+        request.setCallback(new JsonCallback<User>() {
+
             @Override
             public void onSuccess(User result) {
-                Log.e("stay", "testHttpGet return:" + result);
+                Log.e("stay", "testHttpGet return:" + result.toString());
             }
 
             @Override
@@ -74,7 +81,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
 
-        }.setReturnType(User.class));
+        });
+        request.content = content;
+        RequestTask task = new RequestTask(request);
+        task.execute();
+    }
+
+    public void testHttpPostOnSubThreadForDownload() {
+
+        String url = "http://api.stay4it.com/v1/public/core/?service=user.login";
+        String content = "account=stay4it&password=123456";
+        Request request = new Request(url, Request.RequestMethod.POST);
+        String path = Environment.getExternalStorageDirectory() + File.separator + "demo.txt";
+        request.setCallback(new FileCallback() {
+            @Override
+            public void onSuccess(String path) {
+                Log.e("stay",path);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        }.setCachePath(path));
         request.content = content;
         RequestTask task = new RequestTask(request);
         task.execute();

@@ -9,6 +9,7 @@ import java.net.HttpURLConnection;
 public interface ICallback<T> {
 
     void onSuccess(T result);
+
     void onFailure(Exception e);
 
     T parse(HttpURLConnection connection) throws Exception;

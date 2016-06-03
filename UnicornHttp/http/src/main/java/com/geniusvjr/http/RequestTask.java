@@ -2,7 +2,6 @@ package com.geniusvjr.http;
 
 import android.os.AsyncTask;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 
 /**
@@ -28,7 +27,6 @@ public class RequestTask extends AsyncTask<Void, Integer, Object> {
         try {
             HttpURLConnection connection = HttpUrlConnectionUtil.execute(request);
             return request.iCallback.parse(connection);
-
         } catch (Exception e) {
             return e;
         }
