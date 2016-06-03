@@ -1,35 +1,32 @@
-package com.geniusvjr.unicornhttp.http;
+package com.geniusvjr.http;
+
+import org.apache.http.HttpStatus;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
-import org.apache.http.HttpStatus;
 
 /**
- * Created by dream on 16/6/2.
+ * Created by Stay on 24/6/15.
+ * Powered by www.stay4it.com
  */
 public class HttpUrlConnectionUtil {
-
     public static String execute(Request request) throws IOException {
         switch (request.method) {
             case GET:
-                return get(request);
-            case POST:
-                return post(request);
-            case PUT:
-                return get(request);
             case DELETE:
                 return get(request);
+            case POST:
+            case PUT:
+                return post(request);
         }
 
         return null;
     }
-
 
 
     private static String get(Request request) throws IOException {
@@ -88,16 +85,11 @@ public class HttpUrlConnectionUtil {
         return null;
     }
 
-
-
-
-
-    private static void addHeader(HttpURLConnection connection, Map<String, String> headers){
-        if(headers == null || headers.size() == 0){
+    private static void addHeader(HttpURLConnection connection, Map<String, String> headers) {
+        if (headers == null || headers.size() == 0)
             return;
-        }
 
-        for(Map.Entry<String, String> entry : headers.entrySet()){
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
             connection.addRequestProperty(entry.getKey(), entry.getValue());
         }
     }

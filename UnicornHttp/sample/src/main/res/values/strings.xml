@@ -1,3 +1,4 @@
 <resources>
+    <string name="RunOnSubThread_LABEL">在后台运行的按钮</string>
     <string name="app_name">UnicornHttp</string>
 </resources>
