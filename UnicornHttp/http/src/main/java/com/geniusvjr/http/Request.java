@@ -9,6 +9,7 @@ import java.util.Map;
 public class Request {
     public ICallback iCallback;
     public boolean enableProgressUpdated = false;
+    public OnGlobalExceptionListener onGlobalExceptionListener;
 
     public void setCallback(ICallback iCallback) {
         this.iCallback = iCallback;
@@ -16,6 +17,10 @@ public class Request {
 
     public void enableProgressUpdated(boolean enable) {
         this.enableProgressUpdated = enable;
+    }
+
+    public void setGlobalExceptionListener(OnGlobalExceptionListener onGlobalExceptionListener) {
+        this.onGlobalExceptionListener = onGlobalExceptionListener;
     }
 
     public enum RequestMethod {GET, POST, PUT, DELETE}

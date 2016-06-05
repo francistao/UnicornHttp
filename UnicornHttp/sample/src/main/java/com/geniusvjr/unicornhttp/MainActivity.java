@@ -9,15 +9,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+
+import com.geniusvjr.http.AppException;
 import com.geniusvjr.http.FileCallback;
 import com.geniusvjr.http.JsonCallback;
+import com.geniusvjr.http.OnGlobalExceptionListener;
 import com.geniusvjr.http.Request;
 import com.geniusvjr.http.RequestTask;
 
 import java.io.File;
 
 
-public class MainActivity extends ActionBarActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener{
 
     private Button mRunOnSubThreadBtn;
 
@@ -29,7 +32,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         mRunOnSubThreadBtn.setOnClickListener(this);
     }
 
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -39,6 +41,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 //                testHttpPostOnSubThreadForDownload();
                 testHttpPostOnSubThreadForDownloadProgress();
                 break;
+
         }
     }
 
@@ -55,7 +58,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             }
 
             @Override
-            public void onFailure(Exception e) {
+            public void onFailure(AppException e) {
+                if (e.statusCode == 403){
+                    if("password incorrect".equals(e.responseMessage)){
+//                        TODO
+                    }
+                }
                 e.printStackTrace();
             }
         });
@@ -77,7 +85,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             }
 
             @Override
-            public void onFailure(Exception e) {
+            public void onFailure(AppException e) {
                 e.printStackTrace();
             }
 
@@ -97,12 +105,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         request.setCallback(new FileCallback() {
             @Override
             public void onSuccess(String path) {
-                Log.e("stay",path);
+                Log.e("stay", path);
             }
 
             @Override
-            public void onFailure(Exception e) {
-
+            public void onFailure(AppException e) {
             }
         }.setCachePath(path));
         request.content = content;
@@ -116,24 +123,31 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         Request request = new Request(url, Request.RequestMethod.GET);
         String path = Environment.getExternalStorageDirectory() + File.separator + "test.jpg";
         request.setCallback(new FileCallback() {
+            @Override
+            public void onProgressUpdated(int curLen, int totalLen) {
+                Log.e("stay", "download:" + curLen + "/" + totalLen);
+            }
 
             @Override
             public void onSuccess(String path) {
-                Log.e("stay",path);
+                Log.e("stay", path);
             }
 
             @Override
-            public void onFailure(Exception e) {
+            public void onFailure(AppException e) {
+                if("password incorrect".equals(e.responseMessage)){
+                    //TODO
 
-            }
-
-            @Override
-            public void onProgressUpdated(int curLen, int totalLen) {
-
+                }else if("token invalid".equals(e.responseMessage)){
+                    //TODO
+                }
             }
         }.setCachePath(path));
+        request.setGlobalExceptionListener(this);
         request.enableProgressUpdated(true);
         RequestTask task = new RequestTask(request);
         task.execute();
     }
+
+
 }

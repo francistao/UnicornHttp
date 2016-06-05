@@ -1,5 +1,7 @@
 package com.geniusvjr.http;
 
+import android.webkit.URLUtil;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -11,7 +13,10 @@ import java.util.Map;
  * Powered by www.stay4it.com
  */
 public class HttpUrlConnectionUtil {
-    public static HttpURLConnection execute(Request request) throws IOException {
+    public static HttpURLConnection execute(Request request) throws AppException {
+        if (!URLUtil.isNetworkUrl(request.url)) {
+            throw new AppException("the url :" + request.url + " is not valid");
+        }
         switch (request.method) {
             case GET:
             case DELETE:
@@ -25,30 +30,39 @@ public class HttpUrlConnectionUtil {
     }
 
 
-    private static HttpURLConnection get(Request request) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) new URL(request.url).openConnection();
-        connection.setRequestMethod(request.method.name());
-        connection.setConnectTimeout(15 * 3000);
-        connection.setReadTimeout(15 * 3000);
+    private static HttpURLConnection get(Request request) throws AppException {
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(request.url).openConnection();
+            connection.setRequestMethod(request.method.name());
+            connection.setConnectTimeout(15 * 3000);
+            connection.setReadTimeout(15 * 3000);
 
-        addHeader(connection, request.headers);
+            addHeader(connection, request.headers);
 
-        return connection;
+            return connection;
+        } catch (IOException e) {
+            throw new AppException(e.getMessage());
+        }
     }
 
 
-    private static HttpURLConnection post(Request request) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) new URL(request.url).openConnection();
-        connection.setRequestMethod(request.method.name());
-        connection.setConnectTimeout(15 * 3000);
-        connection.setReadTimeout(15 * 3000);
-        connection.setDoOutput(true);
+    private static HttpURLConnection post(Request request) throws AppException {
+        HttpURLConnection connection = null;
+        try {
+            connection = (HttpURLConnection) new URL(request.url).openConnection();
+            connection.setRequestMethod(request.method.name());
+            connection.setConnectTimeout(15 * 3000);
+            connection.setReadTimeout(15 * 3000);
+            connection.setDoOutput(true);
 
 
-        addHeader(connection, request.headers);
+            addHeader(connection, request.headers);
 
-        OutputStream os = connection.getOutputStream();
-        os.write(request.content.getBytes());
+            OutputStream os = connection.getOutputStream();
+            os.write(request.content.getBytes());
+        } catch (IOException e) {
+            throw new AppException(e.getMessage());
+        }
 
         return connection;
     }
